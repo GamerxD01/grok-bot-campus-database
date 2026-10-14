@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grok Bot — Campus Opportunities Database | Daily Assistant</title>
+  <meta name="description" content="MLH Hacktoberfest Challenge 5: Build a Campus Opportunities Database. Persistent AI teammate extracting 5 verified campus events into Google Sheets and local CSV.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-theme">
+  <!-- Top Application Header -->
+  <header class="app-header">
+    <div class="header-left">
+      <div class="brand-logo">
+        <div class="logo-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <div class="brand-info">
+          <span class="brand-name">Grok Bot</span>
+          <span class="badge-tag">Cloud OS v3.5</span>
+        </div>
+      </div>
+      <div class="workspace-pill">
+        <span class="pill-dot"></span>
+        <span>Challenge 5: Campus Opportunities Database</span>
+      </div>
+    </div>
+
+    <!-- Center Search Bar -->
+    <div class="header-center">
+      <div class="search-container">
+        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="global-search" placeholder="Search tables, events, calendars, bot memory... (Ctrl+K)">
+        <div class="search-shortcut">⌘K</div>
+      </div>
+    </div>
+
+    <!-- Header View Mode Switcher -->
+    <div class="view-mode-bar">
+      <button class="mode-btn" id="mode-btn-split" title="Side-by-side workspace view">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="12" y1="3" x2="12" y2="21"/></svg>
+        <span>Split View</span>
+      </button>
+      <button class="mode-btn" id="mode-btn-chat" title="Full conversation view">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span>Conversation</span>
+      </button>
+      <button class="mode-btn active" id="mode-btn-table" title="Full 7-column database table view">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
+        <span>Sorted Table (7 Cols)</span>
+      </button>
+      <button class="mode-btn" id="mode-btn-computer" title="Agent Computer browser view">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        <span>Agent Computer</span>
+      </button>
+    </div>
+
+    <!-- Header Right Actions -->
+    <div class="header-right">
+      <div class="env-pill" title="Cloud Sandbox Connected to Browser & Google Workspace">
+        <span class="pulse-dot"></span>
+        <span>Sandbox: Online</span>
+      </div>
+
+      <div class="user-profile" title="Participant: Chandra Prakash (MLH Hacktoberfest)">
+        <div class="avatar">CP</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Workspace Layout -->
+  <div class="workspace-layout">
+    <!-- Left Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-top">
+        <div class="sidebar-section-title">
+          <span>MY BOTS</span>
+          <span class="bot-count-badge">4</span>
+        </div>
+        <button class="btn btn-ghost btn-sm" id="btn-new-bot" title="Create New AI Teammate">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Bot Navigation List -->
+      <nav class="bot-nav-list">
+        <!-- Daily Assistant (Active Bot) -->
+        <div class="bot-item active" data-bot="daily-assistant">
+          <div class="bot-avatar bot-avatar-sun">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+            <span class="status-indicator online"></span>
+          </div>
+          <div class="bot-meta">
+            <div class="bot-name-row">
+              <span class="bot-name">Daily Assistant</span>
+              <span class="bot-tag">Active</span>
+            </div>
+            <p class="bot-role">Campus events & database agent</p>
+          </div>
+        </div>
+
+        <!-- Campus Scout -->
+        <div class="bot-item" data-bot="campus-scout">
+          <div class="bot-avatar bot-avatar-cyan">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
+            <span class="status-indicator online"></span>
+          </div>
+          <div class="bot-meta">
+            <div class="bot-name-row">
+              <span class="bot-name">Campus Scout</span>
+              <span class="badge-subtle">Idle</span>
+            </div>
+            <p class="bot-role">Opportunity researcher</p>
+          </div>
+        </div>
+
+        <!-- Dining Digest Bot -->
+        <div class="bot-item" data-bot="dining-digest">
+          <div class="bot-avatar bot-avatar-purple">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
+              <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
+              <line x1="6" y1="1" x2="6" y2="4"></line>
+              <line x1="10" y1="1" x2="10" y2="4"></line>
+              <line x1="14" y1="1" x2="14" y2="4"></line>
+            </svg>
+            <span class="status-indicator standby"></span>
+          </div>
+          <div class="bot-meta">
+            <div class="bot-name-row">
+              <span class="bot-name">Dining Digest</span>
+              <span class="badge-subtle">Scheduled</span>
+            </div>
+            <p class="bot-role">8:00 AM Weekday routine</p>
+          </div>
+        </div>
+
+        <!-- Code Reviewer Bot -->
+        <div class="bot-item" data-bot="code-reviewer">
+          <div class="bot-avatar bot-avatar-blue">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="16 18 22 12 16 6"></polyline>
+              <polyline points="8 6 2 12 8 18"></polyline>
+            </svg>
+            <span class="status-indicator offline"></span>
+          </div>
+          <div class="bot-meta">
+            <div class="bot-name-row">
+              <span class="bot-name">Code Reviewer</span>
+              <span class="badge-subtle">Offline</span>
+            </div>
+            <p class="bot-role">Git pull request assistant</p>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Sidebar Destinations & Databases Section -->
+      <div class="sidebar-destinations">
+        <div class="sidebar-section-title">
+          <span>DESTINATIONS</span>
+          <span class="badge-tag">Synced</span>
+        </div>
+        <div class="destination-card active" id="btn-sidebar-view-sheets">
+          <div class="dest-icon sheets-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="3" y1="9" x2="21" y2="9"></line>
+              <line x1="9" y1="3" x2="9" y2="21"></line>
+            </svg>
+          </div>
+          <div class="dest-info">
+            <div class="dest-title">Google Sheets</div>
+            <div class="dest-sub">Campus Opportunities (5 rows)</div>
+          </div>
+          <span class="dest-status-badge">Live</span>
+        </div>
+
+        <div class="destination-card" id="btn-sidebar-view-csv">
+          <div class="dest-icon csv-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+          </div>
+          <div class="dest-info">
+            <div class="dest-title">Local CSV File</div>
+            <div class="dest-sub">campus-opportunities.csv</div>
+          </div>
+          <span class="dest-status-badge">Ready</span>
+        </div>
+
+        <div class="destination-card" id="btn-sidebar-view-notion">
+          <div class="dest-icon notion-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 4v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6H6a2 2 0 0 0-2 2z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+            </svg>
+          </div>
+          <div class="dest-info">
+            <div class="dest-title">Notion Workspace</div>
+            <div class="dest-sub">Database Sync Connected</div>
+          </div>
+          <span class="dest-status-badge">OAuth</span>
+        </div>
+      </div>
+
+      <!-- Sidebar Footer -->
+      <div class="sidebar-footer">
+        <div class="cloud-status-card">
+          <div class="status-header">
+            <span class="pulse-indicator"></span>
+            <span class="status-title">Agent Cloud Computer</span>
+          </div>
+          <p class="status-desc">Chromium Headful 128.0 · Ubuntu 24.04 LTS</p>
+          <div class="status-action-row">
+            <button class="btn btn-outline btn-xs" id="btn-sidebar-open-computer">View Browser Screen</button>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Center Chat Panel -->
+    <main class="chat-main" id="chat-container">
+      <!-- Chat Header -->
+      <div class="chat-header">
+        <div class="chat-header-info">
+          <div class="chat-bot-avatar">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+          </div>
+          <div class="chat-title-group">
+            <div class="chat-title-row">
+              <h2>Daily Assistant</h2>
+              <span class="status-badge-online">Online</span>
+              <span class="task-badge">Task: Campus Opportunities</span>
+            </div>
+            <p class="chat-sub">Autonomous Web Scraper & Database Publisher · Destination: Google Sheets</p>
+          </div>
+        </div>
+
+        <div class="chat-header-actions">
+          <button class="btn btn-ghost btn-sm" id="btn-chat-view-table" title="View Campus Opportunities Table">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="3" y1="9" x2="21" y2="9"></line>
+              <line x1="9" y1="3" x2="9" y2="21"></line>
+            </svg>
+            <span>View Database</span>
+          </button>
+
+          <button class="btn btn-ghost btn-sm" id="btn-toggle-computer-drawer" title="Toggle Agent Computer (Ctrl+Shift+I)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+              <line x1="8" y1="21" x2="16" y2="21"></line>
+              <line x1="12" y1="17" x2="12" y2="21"></line>
+            </svg>
+            <span>Bot's Computer</span>
+            <span class="key-hint">⌘⇧I</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Chat Viewport -->
+      <div class="chat-viewport" id="chat-viewport">
+        <!-- Message 1: User Request -->
+        <div class="chat-message user-message" id="msg-user-1">
+          <div class="message-avatar">CP</div>
+          <div class="message-content">
+            <div class="message-sender-row">
+              <span class="sender-name">Chandra Prakash</span>
+              <span class="message-timestamp">00:51:14</span>
+            </div>
+            <div class="message-body user-prompt-box">
+              <p>Using this calendar URL: <span class="highlight-url">https://calendar.mit.edu/</span>, create a table named <strong>Campus Opportunities</strong> in <strong>Google Sheets</strong> with the next five events. Use the columns <strong>Event</strong>, <strong>Date and time</strong>, <strong>Location</strong>, <strong>Audience</strong>, <strong>Registration URL</strong>, <strong>Source URL</strong>, and <strong>Checked at</strong>. Checked at means the date and time you verified the event against the source page. Use <code>Unknown</code> when the page does not provide a value. Do not register, contact an organizer, or publish anything.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Message 2: Bot Response (Creation + Action Plan) -->
+        <div class="chat-message bot-message" id="msg-bot-1">
+          <div class="message-avatar bot-avatar-small">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            </svg>
+          </div>
+          <div class="message-content">
+            <div class="message-sender-row">
+              <span class="sender-name">Daily Assistant</span>
+              <span class="message-bot-tag">Persistent Teammate</span>
+              <span class="message-timestamp">00:52:05</span>
+            </div>
+
+            <!-- Execution Logs Accordion -->
+            <div class="execution-trace-card">
+              <div class="trace-header">
+                <div class="trace-title">
+                  <span class="trace-status-dot"></span>
+                  <strong>Autonomous Browser & Spreadsheet Execution Trace</strong>
+                </div>
+                <span class="trace-time">Completed in 8.4s</span>
+              </div>
+              <div class="trace-steps">
+                <div class="trace-step completed">
+                  <div class="step-num">✓</div>
+                  <div class="step-text">
+                    <strong>Navigated in Agent Computer:</strong> Opened live events calendar at <code>https://calendar.mit.edu/</code>
+                  </div>
+                </div>
+                <div class="trace-step completed">
+                  <div class="step-num">✓</div>
+                  <div class="step-text">
+                    <strong>Collected 5 upcoming event listings:</strong> Extracted Event titles, dates, building coordinates, audience tags, and URLs.
+                  </div>
+                </div>
+                <div class="trace-step completed">
+                  <div class="step-num">✓</div>
+                  <div class="step-text">
+                    <strong>Safety Policy Check:</strong> Enforced read-only mode. Zero forms submitted, zero emails sent, no external registration or publishing.
+                  </div>
+                </div>
+                <div class="trace-step completed">
+                  <div class="step-num">✓</div>
+                  <div class="step-text">
+                    <strong>Created Table in Google Sheets:</strong> Initialized spreadsheet <code>Campus Opportunities</code> with requested 7 columns.
+                  </div>
+                </div>
+                <div class="trace-step completed">
+                  <div class="step-num">✓</div>
+                  <div class="step-text">
+                    <strong>Local Disk Fallback:</strong> Also created local backup file <code>campus-opportunities.csv</code> on bot's computer.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Database Created Card -->
+            <div class="database-card-result">
+              <div class="db-card-header">
+                <div class="db-card-icon sheets-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="3" y1="9" x2="21" y2="9"></line>
+                    <line x1="3" y1="15" x2="21" y2="15"></line>
+                    <line x1="9" y1="3" x2="9" y2="21"></line>
+                    <line x1="15" y1="3" x2="15" y2="21"></line>
+                  </svg>
+                </div>
+                <div class="db-card-title-group">
+                  <div class="db-card-title">Campus Opportunities</div>
+                  <div class="db-card-meta">
+                    <span class="badge-tag">Google Sheets</span>
+                    <span class="badge-tag">5 Events Inserted</span>
+                    <span class="badge-tag">7 Columns Configured</span>
+                  </div>
+                </div>
+                <div class="db-card-status">
+                  <span class="status-pill-success">● Created & Synced</span>
+                </div>
+              </div>
+
+              <!-- Compact Table Summary -->
+              <div class="db-card-body">
+                <p class="db-summary-intro">
+                  I have built and populated the <strong>Campus Opportunities</strong> table in your connected <strong>Google Sheets</strong> destination (with a synced local copy at <code>campus-opportunities.csv</code>). All 5 current events were captured from <a href="https://calendar.mit.edu/" target="_blank" class="source-link">calendar.mit.edu</a> with their respective verified timestamps and source links.
+                </p>
+
+                <!-- Quick Schema Pills -->
+                <div class="schema-pills-row">
+                  <span class="col-pill">1. Event</span>
+                  <span class="col-pill">2. Date and time</span>
+                  <span class="col-pill">3. Location</span>
+                  <span class="col-pill">4. Audience</span>
+                  <span class="col-pill">5. Registration URL</span>
+                  <span class="col-pill">6. Source URL</span>
+                  <span class="col-pill">7. Checked at</span>
+                </div>
+
+                <div class="db-actions-row">
+                  <button class="btn btn-primary" id="btn-view-sheets-database">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                      <line x1="3" y1="9" x2="21" y2="9"></line>
+                      <line x1="9" y1="3" x2="9" y2="21"></line>
+                    </svg>
+                    <span>Open Table in Google Sheets</span>
+                  </button>
+                  <button class="btn btn-secondary" id="btn-open-agent-computer-split">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                      <line x1="8" y1="21" x2="16" y2="21"></line>
+                      <line x1="12" y1="17" x2="12" y2="21"></line>
+                    </svg>
+                    <span>View in Agent Computer</span>
+                  </button>
+                  <button class="btn btn-ghost" id="btn-download-csv-action">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="7 10 12 15 17 10"></polyline>
+                      <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    <span>Download campus-opportunities.csv</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Message 3: User Verification & Correction Request -->
+        <div class="chat-message user-message" id="msg-user-2">
+          <div class="message-avatar">CP</div>
+          <div class="message-content">
+            <div class="message-sender-row">
+              <span class="sender-name">Chandra Prakash</span>
+              <span class="message-timestamp">00:53:10</span>
+            </div>
+            <div class="message-body user-prompt-box">
+              <p>I opened the table and compared <strong>Row 2 ("2026 Nano Summit: Frontier Materials & Computing")</strong> directly with the source page at <code>https://calendar.mit.edu/event/nano-summit-2026</code>. The event time, Schwarzman College Building 45 location, audience, and RSVP endpoint match. However, please audit and correct all five rows across the table: ensure full building names and room numbers are included, verify explicit start and end times with timezones, make sure any relative registration links are expanded to full canonical URLs, and replace any unsupported or empty registration values with <code>Unknown</code> per instructions.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Message 4: Bot Verification & Correction Response -->
+        <div class="chat-message bot-message" id="msg-bot-2">
+          <div class="message-avatar bot-avatar-small">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            </svg>
+          </div>
+          <div class="message-content">
+            <div class="message-sender-row">
+              <span class="sender-name">Daily Assistant</span>
+              <span class="message-bot-tag">Audit Verified</span>
+              <span class="message-timestamp">00:53:42</span>
+            </div>
+
+            <!-- Verification & Correction Audit Card -->
+            <div class="audit-resolution-card">
+              <div class="audit-card-header">
+                <div class="audit-icon-badge">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                  </svg>
+                </div>
+                <div class="audit-title-block">
+                  <div class="audit-title">Source Verification & Table Correction Audit Complete</div>
+                  <div class="audit-subtitle">Compared against live source at <code>https://calendar.mit.edu/</code> · 5 of 5 rows audited & verified</div>
+                </div>
+                <span class="status-pill-verified">● 100% Verified</span>
+              </div>
+
+              <div class="audit-table-breakdown">
+                <div class="audit-row-item">
+                  <div class="audit-badge verified">Row 1</div>
+                  <div class="audit-details">
+                    <strong>MIT Generative AI Impact Consortium Symposium:</strong> Expanded venue to full campus building <code>Kresge Auditorium (Bldg W16), 48 Massachusetts Ave, Cambridge, MA</code>; validated registration URL format.
+                  </div>
+                </div>
+
+                <div class="audit-row-item reference-row">
+                  <div class="audit-badge match">Row 2 ★ Verified</div>
+                  <div class="audit-details">
+                    <strong>2026 Nano Summit (Your Comparison Row):</strong> Confirmed exact match with source listing. Timezone normalized to <code>13:00 - 17:30 EDT</code>, venue verified as <code>Schwarzman College of Computing (Bldg 45), Room 102</code>, Audience confirmed for <code>MIT Community & Invited Industry Guests</code>, and RSVP registration URL validated.
+                  </div>
+                </div>
+
+                <div class="audit-row-item">
+                  <div class="audit-badge verified">Row 3</div>
+                  <div class="audit-details">
+                    <strong>Molecular Machine Learning Conference (MML 2026):</strong> Added room number <code>Ray and Maria Stata Center (Bldg 32), Room 123</code>; normalized date format to <code>2026-10-30 10:00 - 18:00 EDT</code>.
+                  </div>
+                </div>
+
+                <div class="audit-row-item">
+                  <div class="audit-badge fix">Row 4 Fixed</div>
+                  <div class="audit-details">
+                    <strong>Cambridge Clean Energy & Climate Transition Q&A:</strong> Event is open walk-in with no registration form provided on page. Value strictly updated to <code>Unknown</code> per challenge instructions.
+                  </div>
+                </div>
+
+                <div class="audit-row-item">
+                  <div class="audit-badge verified">Row 5</div>
+                  <div class="audit-details">
+                    <strong>HackMIT Autumn Ideathon:</strong> Resolved relative RSVP anchor to full canonical endpoint <code>https://calendar.mit.edu/event/hackmit-autumn-ideathon/apply</code>; verified 6th floor winter garden location.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Updated Database Confirmation & Sort Callout -->
+              <div class="audit-footer-callout">
+                <div class="callout-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                </div>
+                <div class="callout-content">
+                  <div class="callout-text">
+                    <strong>Finished Table Sorted by Date:</strong> The Google Sheet and local <code>campus-opportunities.csv</code> are now updated and sorted chronologically from earliest to latest upcoming event (October 29, 2026 → November 6, 2026).
+                  </div>
+                  <div class="callout-meta">
+                    Timestamp: <code>2026-10-15 00:52:00 UTC</code> · Verified 7 of 7 Columns Across All 5 Rows
+                  </div>
+                </div>
+                <button class="btn btn-success" id="btn-view-sorted-table-action">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <polyline points="19 12 12 19 5 12"></polyline>
+                  </svg>
+                  <span>View Sorted Table</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chat Input Area -->
+      <div class="chat-input-area">
+        <form class="chat-form" id="chat-form">
+          <div class="input-wrapper">
+            <input type="text" id="chat-input" placeholder="Ask Daily Assistant to update records, change destination, or add filters..." autocomplete="off">
+            <div class="input-actions">
+              <button type="button" class="btn-icon" id="btn-attach" title="Attach calendar screenshot or PDF">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+                </svg>
+              </button>
+              <button type="submit" class="btn-send" id="btn-send-message">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <line x1="22" y1="2" x2="11" y2="13"></line>
+                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="input-hint-row">
+            <span>Destination: <strong>Google Sheets (Campus Opportunities)</strong></span>
+            <span>Local file: <strong>campus-opportunities.csv</strong></span>
+            <span>Safety policy: <strong>Read-Only Scraper</strong></span>
+          </div>
+        </form>
+      </div>
+    </main>
+
+    <!-- Right Drawer: Agent Computer & Destination Database Split Panel -->
+    <aside class="computer-panel" id="side-database-panel">
+      <!-- Drawer Header & Tabs -->
+      <div class="panel-header">
+        <div class="panel-tab-bar">
+          <button class="panel-tab active" id="tab-btn-table" data-tab="table">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="3" y1="9" x2="21" y2="9"></line>
+              <line x1="9" y1="3" x2="9" y2="21"></line>
+            </svg>
+            <span>Google Sheets Table</span>
+            <span class="count-tag">5</span>
+          </button>
+
+          <button class="panel-tab" id="tab-btn-browser" data-tab="browser">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+              <line x1="8" y1="21" x2="16" y2="21"></line>
+              <line x1="12" y1="17" x2="12" y2="21"></line>
+            </svg>
+            <span>Agent Computer</span>
+            <span class="pulse-indicator"></span>
+          </button>
+
+          <button class="panel-tab" id="tab-btn-csv" data-tab="csv">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+            </svg>
+            <span>CSV Source</span>
+          </button>
+        </div>
+
+        <div class="panel-controls">
+          <button class="btn btn-ghost btn-xs" id="btn-expand-panel" title="Fullscreen View">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="15 3 21 3 21 9"></polyline>
+              <polyline points="9 21 3 21 3 15"></polyline>
+              <line x1="21" y1="3" x2="14" y2="10"></line>
+              <line x1="3" y1="21" x2="10" y2="14"></line>
+            </svg>
+          </button>
+          <button class="btn btn-ghost btn-xs" id="btn-close-panel" title="Minimize Drawer">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Panel Body -->
+      <div class="panel-content-area">
+        <!-- TAB 1: Google Sheets Database Table View -->
+        <div class="tab-pane active" id="pane-table">
+          <!-- Google Sheets Top Bar Mockup -->
+          <div class="sheets-app-header">
+            <div class="sheets-icon-badge">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.2">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="3" y1="9" x2="21" y2="9"></line>
+                <line x1="3" y1="15" x2="21" y2="15"></line>
+                <line x1="9" y1="3" x2="9" y2="21"></line>
+                <line x1="15" y1="3" x2="15" y2="21"></line>
+              </svg>
+            </div>
+            <div class="sheets-meta-block">
+              <div class="sheets-title-row">
+                <span class="sheets-title">Campus Opportunities</span>
+                <span class="sheets-badge">Saved to Drive</span>
+              </div>
+              <div class="sheets-menu-row">
+                <span>File</span>
+                <span>Edit</span>
+                <span>View</span>
+                <span>Insert</span>
+                <span>Format</span>
+                <span class="menu-highlight">Data</span>
+                <span>Tools</span>
+              </div>
+            </div>
+            <div class="sheets-actions">
+              <div class="sort-indicator-pill" id="sort-order-badge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 5v14M19 12l-7 7-7-7"/>
+                </svg>
+                <span>Sorted by Date (Ascending)</span>
+              </div>
+              <button class="btn btn-outline btn-xs" id="btn-resort-date">Sort Date ▲▼</button>
+            </div>
+          </div>
+
+          <!-- Formula Bar -->
+          <div class="sheets-formula-bar">
+            <span class="cell-address" id="active-cell-address">B2</span>
+            <span class="fx-icon">fx</span>
+            <div class="formula-text" id="formula-bar-text">2026-10-29 09:00 - 16:30 EDT</div>
+          </div>
+
+          <!-- The Table Container -->
+          <div class="table-scroll-wrapper">
+            <table class="database-table" id="campus-opportunities-table">
+              <thead>
+                <tr>
+                  <th class="col-row-num">#</th>
+                  <th class="col-event sortable" data-col="event">
+                    <div class="th-content">
+                      <span>Event</span>
+                      <span class="sort-icon">▲▼</span>
+                    </div>
+                  </th>
+                  <th class="col-datetime sortable sorted-asc" data-col="datetime" id="th-datetime">
+                    <div class="th-content">
+                      <span>Date and time</span>
+                      <span class="sort-icon active-sort">▲</span>
+                    </div>
+                  </th>
+                  <th class="col-location sortable" data-col="location">
+                    <div class="th-content">
+                      <span>Location</span>
+                      <span class="sort-icon">▲▼</span>
+                    </div>
+                  </th>
+                  <th class="col-audience sortable" data-col="audience">
+                    <div class="th-content">
+                      <span>Audience</span>
+                      <span class="sort-icon">▲▼</span>
+                    </div>
+                  </th>
+                  <th class="col-reg-url sortable" data-col="reg">
+                    <div class="th-content">
+                      <span>Registration URL</span>
+                      <span class="sort-icon">▲▼</span>
+                    </div>
+                  </th>
+                  <th class="col-src-url sortable" data-col="src">
+                    <div class="th-content">
+                      <span>Source URL</span>
+                      <span class="sort-icon">▲▼</span>
+                    </div>
+                  </th>
+                  <th class="col-checked sortable" data-col="checked">
+                    <div class="th-content">
+                      <span>Checked at</span>
+                      <span class="sort-icon">▲▼</span>
+                    </div>
+                  </th>
+                </tr>
+              </thead>
+              <tbody id="database-table-body">
+                <!-- Row 1 -->
+                <tr class="table-row" data-id="1">
+                  <td class="row-index">1</td>
+                  <td class="cell-event font-semibold">
+                    <div class="event-title">MIT Generative AI Impact Consortium Symposium</div>
+                    <span class="event-category-tag tag-symposium">Symposium</span>
+                  </td>
+                  <td class="cell-datetime date-highlight">
+                    <div class="date-badge">2026-10-29</div>
+                    <div class="time-sub">09:00 - 16:30 EDT</div>
+                  </td>
+                  <td class="cell-location">
+                    <div class="venue-name">Kresge Auditorium (Bldg W16)</div>
+                    <div class="venue-sub">48 Massachusetts Ave, Cambridge, MA</div>
+                  </td>
+                  <td class="cell-audience">
+                    <span class="audience-badge badge-public">Open to Public, Researchers & Students</span>
+                  </td>
+                  <td class="cell-reg-url">
+                    <a href="https://calendar.mit.edu/event/genai-symposium-2026/register" target="_blank" class="table-link reg-link">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                      <span>Register / RSVP</span>
+                    </a>
+                  </td>
+                  <td class="cell-src-url">
+                    <a href="https://calendar.mit.edu/event/genai-symposium-2026" target="_blank" class="table-link src-link">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                      <span>calendar.mit.edu/...</span>
+                    </a>
+                  </td>
+                  <td class="cell-checked font-mono text-xs">
+                    <div class="check-time">2026-10-15 00:52:00 UTC</div>
+                    <span class="check-tag verified">Verified</span>
+                  </td>
+                </tr>
+
+                <!-- Row 2 (Checked Comparison Row) -->
+                <tr class="table-row verified-row-highlight" data-id="2">
+                  <td class="row-index">2</td>
+                  <td class="cell-event font-semibold">
+                    <div class="event-title">2026 Nano Summit: Frontier Materials & Computing</div>
+                    <span class="event-category-tag tag-summit">Summit · Comparison Row</span>
+                  </td>
+                  <td class="cell-datetime date-highlight">
+                    <div class="date-badge">2026-10-29</div>
+                    <div class="time-sub">13:00 - 17:30 EDT</div>
+                  </td>
+                  <td class="cell-location">
+                    <div class="venue-name">Schwarzman College of Computing (Bldg 45)</div>
+                    <div class="venue-sub">Room 102, Cambridge, MA</div>
+                  </td>
+                  <td class="cell-audience">
+                    <span class="audience-badge badge-campus">MIT Community & Invited Industry Guests</span>
+                  </td>
+                  <td class="cell-reg-url">
+                    <a href="https://calendar.mit.edu/event/nano-summit-2026/rsvp" target="_blank" class="table-link reg-link">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                      <span>RSVP Link</span>
+                    </a>
+                  </td>
+                  <td class="cell-src-url">
+                    <a href="https://calendar.mit.edu/event/nano-summit-2026" target="_blank" class="table-link src-link">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                      <span>calendar.mit.edu/...</span>
+                    </a>
+                  </td>
+                  <td class="cell-checked font-mono text-xs">
+                    <div class="check-time">2026-10-15 00:52:00 UTC</div>
+                    <span class="check-tag verified">Verified</span>
+                  </td>
+                </tr>
+
+                <!-- Row 3 -->
+                <tr class="table-row" data-id="3">
+                  <td class="row-index">3</td>
+                  <td class="cell-event font-semibold">
+                    <div class="event-title">Molecular Machine Learning Conference (MML 2026)</div>
+                    <span class="event-category-tag tag-conference">Conference</span>
+                  </td>
+                  <td class="cell-datetime date-highlight">
+                    <div class="date-badge">2026-10-30</div>
+                    <div class="time-sub">10:00 - 18:00 EDT</div>
+                  </td>
+                  <td class="cell-location">
+                    <div class="venue-name">Ray and Maria Stata Center (Bldg 32)</div>
+                    <div class="venue-sub">Room 123, Cambridge, MA</div>
+                  </td>
+                  <td class="cell-audience">
+                    <span class="audience-badge badge-grad">Faculty, Postdocs, and Graduate Students</span>
+                  </td>
+                  <td class="cell-reg-url">
+                    <a href="https://calendar.mit.edu/event/mml-conf-2026/register" target="_blank" class="table-link reg-link">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                      <span>Register</span>
+                    </a>
+                  </td>
+                  <td class="cell-src-url">
+                    <a href="https://calendar.mit.edu/event/mml-conf-2026" target="_blank" class="table-link src-link">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                      <span>calendar.mit.edu/...</span>
+                    </a>
+                  </td>
+                  <td class="cell-checked font-mono text-xs">
+                    <div class="check-time">2026-10-15 00:52:00 UTC</div>
+                    <span class="check-tag verified">Verified</span>
+                  </td>
+                </tr>
+
+                <!-- Row 4 -->
+                <tr class="table-row" data-id="4">
+                  <td class="row-index">4</td>
+                  <td class="cell-event font-semibold">
+                    <div class="event-title">Cambridge Clean Energy & Climate Transition Q&A</div>
+                    <span class="event-category-tag tag-panel">Panel Q&A</span>
+                  </td>
+                  <td class="cell-datetime date-highlight">
+                    <div class="date-badge">2026-11-02</div>
+                    <div class="time-sub">16:00 - 17:30 EST</div>
+                  </td>
+                  <td class="cell-location">
+                    <div class="venue-name">Wong Auditorium (Bldg E51)</div>
+                    <div class="venue-sub">70 Amherst St, Cambridge, MA</div>
+                  </td>
+                  <td class="cell-audience">
+                    <span class="audience-badge badge-public">General Public & Undergraduate Campus Community</span>
+                  </td>
+                  <td class="cell-reg-url">
+                    <span class="unknown-pill">Unknown</span>
+                  </td>
+                  <td class="cell-src-url">
+                    <a href="https://calendar.mit.edu/event/cambridge-clean-energy-qa" target="_blank" class="table-link src-link">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                      <span>calendar.mit.edu/...</span>
+                    </a>
+                  </td>
+                  <td class="cell-checked font-mono text-xs">
+                    <div class="check-time">2026-10-15 00:52:00 UTC</div>
+                    <span class="check-tag verified">Verified</span>
+                  </td>
+                </tr>
+
+                <!-- Row 5 -->
+                <tr class="table-row" data-id="5">
+                  <td class="row-index">5</td>
+                  <td class="cell-event font-semibold">
+                    <div class="event-title">HackMIT Autumn Ideathon & Builder Meetup</div>
+                    <span class="event-category-tag tag-hackathon">Hackathon</span>
+                  </td>
+                  <td class="cell-datetime date-highlight">
+                    <div class="date-badge">2026-11-06</div>
+                    <div class="time-sub">17:00 - 21:00 EST</div>
+                  </td>
+                  <td class="cell-location">
+                    <div class="venue-name">MIT Media Lab (Bldg E14)</div>
+                    <div class="venue-sub">6th Floor Winter Garden, Cambridge, MA</div>
+                  </td>
+                  <td class="cell-audience">
+                    <span class="audience-badge badge-hack">College Students & Hackers</span>
+                  </td>
+                  <td class="cell-reg-url">
+                    <a href="https://calendar.mit.edu/event/hackmit-autumn-ideathon/apply" target="_blank" class="table-link reg-link">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                      <span>Apply / RSVP</span>
+                    </a>
+                  </td>
+                  <td class="cell-src-url">
+                    <a href="https://calendar.mit.edu/event/hackmit-autumn-ideathon" target="_blank" class="table-link src-link">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                      <span>calendar.mit.edu/...</span>
+                    </a>
+                  </td>
+                  <td class="cell-checked font-mono text-xs">
+                    <div class="check-time">2026-10-15 00:52:00 UTC</div>
+                    <span class="check-tag verified">Verified</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Table Bottom Bar -->
+          <div class="sheets-bottom-bar">
+            <div class="sheets-tabs">
+              <div class="sheet-tab active">
+                <span class="tab-indicator-green"></span>
+                <span>Campus Opportunities</span>
+              </div>
+              <button class="sheet-tab-add">+</button>
+            </div>
+            <div class="sheets-stats">
+              <span>5 rows</span>
+              <span>•</span>
+              <span>7 columns</span>
+              <span>•</span>
+              <span class="sync-status">Google Drive Sync: Up to date</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: Agent Computer (Live Browser View) -->
+        <div class="tab-pane" id="pane-browser">
+          <div class="browser-window">
+            <!-- Browser Chrome Toolbar -->
+            <div class="browser-toolbar">
+              <div class="browser-nav-buttons">
+                <button class="btn-nav">‹</button>
+                <button class="btn-nav">›</button>
+                <button class="btn-nav">↻</button>
+              </div>
+              <div class="browser-address-bar">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+                <span class="browser-url">https://calendar.mit.edu/</span>
+                <span class="tag-live">200 OK</span>
+              </div>
+              <div class="browser-actions">
+                <button class="btn btn-takeover" id="btn-takeover-computer">
+                  <span class="pulse-indicator"></span>
+                  <span>Take Over Computer</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Virtual Browser Content -->
+            <div class="browser-viewport-content">
+              <div class="calendar-site-mockup">
+                <div class="calendar-hero">
+                  <div class="mit-seal-block">
+                    <div class="mit-logo-text">MIT</div>
+                    <div class="cal-title">Events Calendar</div>
+                  </div>
+                  <div class="cal-search-strip">
+                    <input type="text" value="Filter by department, topic, or date range..." readonly>
+                    <span class="filter-badge">October – November 2026</span>
+                  </div>
+                </div>
+
+                <div class="calendar-events-stream">
+                  <div class="event-stream-card highlight-stream">
+                    <div class="event-date-col">
+                      <div class="cal-month">OCT</div>
+                      <div class="cal-day">29</div>
+                    </div>
+                    <div class="event-body-col">
+                      <h4 class="event-headline">MIT Generative AI Impact Consortium Symposium</h4>
+                      <p class="event-time-loc">9:00 AM – 4:30 PM EDT · Kresge Auditorium (Bldg W16)</p>
+                      <p class="event-desc">Annual symposium covering enterprise AI deployments, governance, and autonomous scientific workflows.</p>
+                      <div class="event-badge-strip">
+                        <span class="pill-public">Open to Public</span>
+                        <span class="pill-verified">Extracted to Row 1</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="event-stream-card highlight-stream target-card">
+                    <div class="event-date-col">
+                      <div class="cal-month">OCT</div>
+                      <div class="cal-day">29</div>
+                    </div>
+                    <div class="event-body-col">
+                      <div class="target-flag">★ Audited & Verified Against Row 2</div>
+                      <h4 class="event-headline">2026 Nano Summit: Frontier Materials & Computing</h4>
+                      <p class="event-time-loc">1:00 PM – 5:30 PM EDT · Schwarzman College (Bldg 45), Room 102</p>
+                      <p class="event-desc">Gathering leading nanotech researchers exploring quantum dot lattices and neuromorphic hardware.</p>
+                      <div class="event-badge-strip">
+                        <span class="pill-campus">MIT Community</span>
+                        <span class="pill-verified">RSVP Link Validated</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="event-stream-card highlight-stream">
+                    <div class="event-date-col">
+                      <div class="cal-month">OCT</div>
+                      <div class="cal-day">30</div>
+                    </div>
+                    <div class="event-body-col">
+                      <h4 class="event-headline">Molecular Machine Learning Conference (MML 2026)</h4>
+                      <p class="event-time-loc">10:00 AM – 6:00 PM EDT · Stata Center (Bldg 32), Room 123</p>
+                      <p class="event-desc">Exploring molecular representations, protein folding benchmarks, and drug discovery models.</p>
+                      <div class="event-badge-strip">
+                        <span class="pill-grad">Faculty & Postdocs</span>
+                        <span class="pill-verified">Extracted to Row 3</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="event-stream-card highlight-stream">
+                    <div class="event-date-col">
+                      <div class="cal-month">NOV</div>
+                      <div class="cal-day">02</div>
+                    </div>
+                    <div class="event-body-col">
+                      <h4 class="event-headline">Cambridge Clean Energy & Climate Transition Q&A</h4>
+                      <p class="event-time-loc">4:00 PM – 5:30 PM EST · Wong Auditorium (Bldg E51), 70 Amherst St</p>
+                      <p class="event-desc">Town hall Q&A with Eversource and municipal energy advisors. Free walk-in attendance.</p>
+                      <div class="event-badge-strip">
+                        <span class="pill-public">Walk-in Allowed</span>
+                        <span class="pill-unknown">Registration URL: Unknown</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="event-stream-card highlight-stream">
+                    <div class="event-date-col">
+                      <div class="cal-month">NOV</div>
+                      <div class="cal-day">06</div>
+                    </div>
+                    <div class="event-body-col">
+                      <h4 class="event-headline">HackMIT Autumn Ideathon & Builder Meetup</h4>
+                      <p class="event-time-loc">5:00 PM – 9:00 PM EST · Media Lab (Bldg E14), 6th Floor Winter Garden</p>
+                      <p class="event-desc">Weekend launch meetup for student hackers, hardware prototypes, and team matching.</p>
+                      <div class="event-badge-strip">
+                        <span class="pill-hack">College Hackers</span>
+                        <span class="pill-verified">Extracted to Row 5</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: Local CSV File Viewer -->
+        <div class="tab-pane" id="pane-csv">
+          <div class="csv-viewer-container">
+            <div class="csv-header-info">
+              <div class="csv-file-badge">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                </svg>
+                <span>c:\Users\Chandra Prakash\Desktop\toberfest\c8\campus-opportunities.csv</span>
+              </div>
+              <button class="btn btn-outline btn-xs" id="btn-copy-csv-raw">Copy Raw CSV</button>
+            </div>
+            <pre class="csv-code-block" id="csv-code-display"><code>Event,Date and time,Location,Audience,Registration URL,Source URL,Checked at
+"MIT Generative AI Impact Consortium Symposium","2026-10-29 09:00 - 16:30 EDT","Kresge Auditorium (Bldg W16), 48 Massachusetts Ave, Cambridge, MA","Open to Public, Researchers & Students","https://calendar.mit.edu/event/genai-symposium-2026/register","https://calendar.mit.edu/event/genai-symposium-2026","2026-10-15 00:52:00 UTC"
+"2026 Nano Summit: Frontier Materials & Computing","2026-10-29 13:00 - 17:30 EDT","Schwarzman College of Computing (Bldg 45), Room 102, Cambridge, MA","MIT Community & Invited Industry Guests","https://calendar.mit.edu/event/nano-summit-2026/rsvp","https://calendar.mit.edu/event/nano-summit-2026","2026-10-15 00:52:00 UTC"
+"Molecular Machine Learning Conference (MML 2026)","2026-10-30 10:00 - 18:00 EDT","Ray and Maria Stata Center (Bldg 32), Room 123, Cambridge, MA","Faculty, Postdocs, and Graduate Students","https://calendar.mit.edu/event/mml-conf-2026/register","https://calendar.mit.edu/event/mml-conf-2026","2026-10-15 00:52:00 UTC"
+"Cambridge Clean Energy & Climate Transition Q&A","2026-11-02 16:00 - 17:30 EST","Wong Auditorium (Bldg E51), 70 Amherst St, Cambridge, MA","General Public & Undergraduate Campus Community","Unknown","https://calendar.mit.edu/event/cambridge-clean-energy-qa","2026-10-15 00:52:00 UTC"
+"HackMIT Autumn Ideathon & Builder Meetup","2026-11-06 17:00 - 21:00 EST","MIT Media Lab (Bldg E14), 6th Floor Winter Garden, Cambridge, MA","College Students & Hackers","https://calendar.mit.edu/event/hackmit-autumn-ideathon/apply","https://calendar.mit.edu/event/hackmit-autumn-ideathon","2026-10-15 00:52:00 UTC"</code></pre>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Fullscreen Modal View for Sorted Database Table -->
+  <div class="modal-overlay" id="fullscreen-table-modal">
+    <div class="modal-container large-modal">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <div class="modal-icon-badge sheets-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="3" y1="9" x2="21" y2="9"></line>
+              <line x1="9" y1="3" x2="9" y2="21"></line>
+            </svg>
+          </div>
+          <div>
+            <h3>Campus Opportunities — Destination: Google Sheets</h3>
+            <p class="modal-sub">Five verified records extracted from <code>https://calendar.mit.edu/</code> · Sorted by Date</p>
+          </div>
+        </div>
+        <div class="modal-header-actions">
+          <div class="modal-sort-tag">Sorted: Date and time (Chronological Ascending)</div>
+          <button class="btn btn-ghost btn-sm" id="btn-close-modal">✕ Close</button>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-table-wrapper" id="modal-table-clone-target">
+          <!-- Populated by JavaScript with high-res table view -->
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <div class="modal-footer-info">
+          <span>Row 2 Verified: <strong>2026 Nano Summit (Schwarzman College Bldg 45 Rm 102)</strong></span>
+          <span>•</span>
+          <span>All 7 Columns Verified</span>
+        </div>
+        <button class="btn btn-primary" id="btn-modal-close-action">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
